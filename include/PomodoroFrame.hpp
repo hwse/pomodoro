@@ -1,3 +1,5 @@
+#pragma once
+
 // For compilers that support precompilation, includes "wx/wx.h".
 #include <wx/wxprec.h>
 
@@ -6,6 +8,8 @@
 #endif
 
 #include <chrono>
+
+#include "PomodoroState.hpp"
 
 enum
 {
@@ -28,7 +32,7 @@ private:
 
     void OnUpdateClock(wxTimerEvent &event);
 
-    wxTimeSpan m_timer_remaining{0, 0, 10};
+    PomodoroStateTracker m_pomodoro_state;
     wxTimer m_clock_timer;
     wxStaticText *m_clock_text = nullptr;
 };

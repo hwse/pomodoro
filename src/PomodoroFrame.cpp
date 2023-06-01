@@ -28,7 +28,7 @@ PomodoroFrame::PomodoroFrame()
     {
         sizer->SetMinSize(WINDOW_SIZE);
 
-        m_clock_text = new wxStaticText(this, 41, m_timer_remaining.Format());
+        m_clock_text = new wxStaticText(this, 41, "TODO");
         m_clock_text->SetFont(m_clock_text->GetFont().Scale(3.0));
         sizer->Add(m_clock_text, 1, wxALIGN_CENTER_HORIZONTAL, 10);
 
@@ -68,14 +68,44 @@ void PomodoroFrame::OnHello(wxCommandEvent &event)
 
 void PomodoroFrame::OnUpdateClock(wxTimerEvent &event)
 {
-    m_timer_remaining -= CLOCK_INTERVAL;
-    if (m_timer_remaining <= wxTimeSpan{0})
+    const auto events = m_pomodoro_state.update_state(CLOCK_INTERVAL);
+    for (const PomodoroEvent &pomodoro_event : events)
     {
-        auto notification = new wxNotificationMessage{"ping", "time is over", this};
-        notification->Show();
-    }
-    if (m_clock_text != nullptr)
-    {
-        m_clock_text->SetLabel(m_timer_remaining.Format());
+        if (std::holds_alternative<PomodoroUpdateRemainingTime>(pomodoro_event))
+        {
+            const auto &update_time = std::get<PomodoroUpdateRemainingTime>(pomodoro_event);
+            if (m_clock_text != nullptr)
+            {
+                m_clock_text->SetLabel(update_time.remaining_time.Format());
+            }
+        }
+        else if (std::holds_alternative<PomodoroStateChange>(pomodoro_event))
+        {
+            const auto &state_change = std::get<PomodoroStateChange>(pomodoro_event);
+            switch (state_change.new_state)
+            {
+                case PomodoroState::WORKING:
+                {
+                    auto notification = new wxNotificationMessage{"Pomodoro Timer", "Break is over, back to work!", this};
+                    notification->Show();
+                    SetStatusText("Work Time!");
+                    break;
+                }
+                case PomodoroState::BREAK:
+                {
+                    auto notification = new wxNotificationMessage{"Pomodoro Timer", "Work time is over, time for a short break!", this};
+                    notification->Show();
+                    SetStatusText("Short Break...");
+                    break;
+                }
+                case PomodoroState::LONG_BREAK:
+                {
+                    auto notification = new wxNotificationMessage{"Pomodoro Timer", "Work time is over, time for a long break!", this};
+                    notification->Show();
+                    SetStatusText("Long Break...");
+                    break;
+                }
+            }
+        }
     }
 }
