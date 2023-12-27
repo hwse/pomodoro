@@ -12,3 +12,10 @@ add_executable(pomodoro WIN32
         src/PomodoroState.cpp)
 target_include_directories(pomodoro PRIVATE include)
 target_link_libraries(pomodoro PRIVATE wx::core)
+install(TARGETS pomodoro RUNTIME DESTINATION bin)
+
+set(CPACK_NSIS_DISPLAY_NAME Pomodoro)
+set(CPACK_NSIS_PACKAGE_NAME Pomodoro)
+set(CPACK_PACKAGE_INSTALL_DIRECTORY Pomodoro)
+set(CPACK_PACKAGE_EXECUTABLES pomodoro Pomodoro)
+include(CPack)
