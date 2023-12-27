@@ -41,5 +41,5 @@ private:
 
     PomodoroState m_current_state{PomodoroState::WORKING};
     size_t m_work_block = 0;
-    wxTimeSpan m_remaining_time{0, 25, 0};
+    wxTimeSpan m_remaining_time{0, 0, 30};
 };

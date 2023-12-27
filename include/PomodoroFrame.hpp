@@ -32,7 +32,10 @@ private:
 
     void OnUpdateClock(wxTimerEvent &event);
 
+    void OnStartStopButton(wxCommandEvent &event);
+
     PomodoroStateTracker m_pomodoro_state;
     wxTimer m_clock_timer;
     wxStaticText *m_clock_text = nullptr;
+    wxButton *m_start_stop_button = nullptr;
 };

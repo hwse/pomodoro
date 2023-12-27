@@ -4,9 +4,9 @@ namespace
 {
 constexpr size_t LONG_BREAK_AFTER_N_BLOCKS = 4;
 const wxTimeSpan ZERO_TIME_SPAN{0};
-const wxTimeSpan WORK_TIME{0, 25, 0};
-const wxTimeSpan BREAK_TIME{0, 5, 0};
-const wxTimeSpan LONG_BREAK_TIME{0, 15, 0};
+const wxTimeSpan WORK_TIME{0, 0, 30};
+const wxTimeSpan BREAK_TIME{0, 0, 5};
+const wxTimeSpan LONG_BREAK_TIME{0, 0, 10};
 
 wxTimeSpan new_state_time(PomodoroState state)
 {

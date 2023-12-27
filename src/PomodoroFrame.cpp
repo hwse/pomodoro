@@ -3,7 +3,7 @@
 
 namespace
 {
-const wxSize WINDOW_SIZE = {300, 100};
+const wxSize WINDOW_SIZE = {300, 200};
 const wxTimeSpan CLOCK_INTERVAL{0, 0, 1};
 }
 
@@ -21,20 +21,19 @@ PomodoroFrame::PomodoroFrame()
     menuHelp->Append(wxID_ABOUT);
 
     auto *menuBar = new wxMenuBar;
-    menuBar->Append(menuFile, "&File");
-    menuBar->Append(menuHelp, "&Help");
+    menuBar->Append(menuFile, _("&File"));
+    menuBar->Append(menuHelp, _("&Help"));
 
     auto *sizer = new wxBoxSizer(wxVERTICAL);
-    {
-        sizer->SetMinSize(WINDOW_SIZE);
+    sizer->SetMinSize(WINDOW_SIZE);
 
-        m_clock_text = new wxStaticText(this, 41, "TODO");
-        m_clock_text->SetFont(m_clock_text->GetFont().Scale(3.0));
-        sizer->Add(m_clock_text, 1, wxALIGN_CENTER_HORIZONTAL, 10);
+    m_clock_text = new wxStaticText(this, 41, "TODO");
+    m_clock_text->SetFont(m_clock_text->GetFont().Scale(3.0));
+    sizer->Add(m_clock_text, 1, wxALIGN_CENTER_HORIZONTAL, 10);
 
-        auto *button = new wxButton(this, 42, "start/stop");
-        sizer->Add(button, 1, wxEXPAND | wxALL, 10);
-    }
+    m_start_stop_button = new wxButton(this, 42, _("stop"));
+    sizer->Add(m_start_stop_button, 1, wxEXPAND | wxALL, 10);
+
     SetSizerAndFit(sizer);
 
     SetMenuBar(menuBar);
@@ -48,6 +47,7 @@ PomodoroFrame::PomodoroFrame()
     Bind(wxEVT_MENU, &PomodoroFrame::OnHello, this, ID_Hello);
     Bind(wxEVT_MENU, &PomodoroFrame::OnAbout, this, wxID_ABOUT);
     Bind(wxEVT_MENU, &PomodoroFrame::OnExit, this, wxID_EXIT);
+    m_start_stop_button->Bind(wxEVT_BUTTON, &PomodoroFrame::OnStartStopButton, this);
 }
 
 void PomodoroFrame::OnExit(wxCommandEvent &event)
@@ -107,5 +107,20 @@ void PomodoroFrame::OnUpdateClock(wxTimerEvent &event)
                 }
             }
         }
+    }
+}
+
+void PomodoroFrame::OnStartStopButton(wxCommandEvent &) {
+    if (m_clock_timer.IsRunning())
+    {
+        m_clock_timer.Stop();
+        m_start_stop_button->SetLabel(_("start"));
+        SetStatusText(_("Stopped timer."));
+    }
+    else
+    {
+        m_clock_timer.Start();
+        m_start_stop_button->SetLabel(_("stop"));
+        SetStatusText(_("Restarted timer..."));
     }
 }
