@@ -24,6 +24,7 @@ endif()
 
 add_executable(pomodoro WIN32
         src/main.cpp
+        src/PomodoroConfig.cpp
         src/PomodoroFrame.cpp
         src/PomodoroState.cpp)
 target_include_directories(pomodoro PRIVATE include)

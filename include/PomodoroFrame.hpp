@@ -9,6 +9,7 @@
 
 #include <chrono>
 
+#include "PomodoroConfig.hpp"
 #include "PomodoroState.hpp"
 
 enum
@@ -34,6 +35,7 @@ private:
 
     void OnStartStopButton(wxCommandEvent &event);
 
+    PomodoroConfig m_config;
     PomodoroStateTracker m_pomodoro_state;
     wxTimer m_clock_timer;
     wxStaticText *m_clock_text = nullptr;

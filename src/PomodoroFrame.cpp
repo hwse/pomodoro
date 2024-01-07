@@ -21,8 +21,15 @@ std::vector<PomodoroState> get_dummy_states()
 
 PomodoroFrame::PomodoroFrame()
         : wxFrame(nullptr, wxID_ANY, "Pomodoro Timer"),
-          m_pomodoro_state(get_dummy_states())
+          m_pomodoro_state()
 {
+    auto states = m_config.get_states();
+    if (states.empty())
+    {
+        states = get_dummy_states();
+        m_config.set_states(states);
+    }
+    m_pomodoro_state.set_states(std::move(states));
 
     auto *menuFile = new wxMenu;
     menuFile->Append(ID_Hello, "&Hello...\tCtrl-H",

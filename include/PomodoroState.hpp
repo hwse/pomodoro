@@ -40,11 +40,10 @@ using PomodoroEvent = std::variant<
 class PomodoroStateTracker
 {
 public:
-    explicit PomodoroStateTracker(std::vector<PomodoroState> states);
-
     std::vector<PomodoroEvent> update_state(wxTimeSpan time_passed);
 
-    void reset();
+    void set_states(std::vector<PomodoroState> states);
+
 private:
     PomodoroState next_state();
 

@@ -22,17 +22,6 @@ T pop_front(std::queue<T> &queue)
 }
 
 
-PomodoroStateTracker::PomodoroStateTracker(std::vector<PomodoroState> states)
-        : m_states(std::move(states))
-{
-    if (m_states.empty())
-    {
-        throw std::logic_error{"states must not be empty"};
-    }
-    m_current_state = next_state();
-}
-
-
 std::vector<PomodoroEvent> PomodoroStateTracker::update_state(wxTimeSpan time_passed)
 {
     std::vector<PomodoroEvent> result;
@@ -47,8 +36,14 @@ std::vector<PomodoroEvent> PomodoroStateTracker::update_state(wxTimeSpan time_pa
     return result;
 }
 
-void PomodoroStateTracker::reset()
+void PomodoroStateTracker::set_states(std::vector<PomodoroState> states)
 {
+    if (states.empty())
+    {
+        throw std::logic_error{"states must not be empty"};
+    }
+    m_states = std::move(states);
+    m_current_state = next_state();
 }
 
 PomodoroState PomodoroStateTracker::next_state()
