@@ -28,6 +28,11 @@ add_executable(pomodoro WIN32
         src/PomodoroState.cpp)
 target_include_directories(pomodoro PRIVATE include)
 target_link_libraries(pomodoro PRIVATE ${WX_LINK_ARG})
+if(MSVC)
+    target_compile_options(pomodoro PRIVATE /W4)
+else()
+    target_compile_options(pomodoro PRIVATE -Wall -Wextra -Wpedantic)
+endif()
 install(TARGETS pomodoro RUNTIME DESTINATION bin)
 
 

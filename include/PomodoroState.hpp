@@ -9,12 +9,18 @@
 
 #include <variant>
 #include <vector>
+#include <queue>
 
-enum class PomodoroState
+struct PomodoroState
 {
-    WORKING,
-    BREAK,
-    LONG_BREAK
+    enum class Type
+    {
+        WORKING,
+        BREAK,
+    };
+
+    Type type = Type::WORKING;
+    wxTimeSpan duration{};
 };
 
 struct PomodoroStateChange
@@ -34,12 +40,15 @@ using PomodoroEvent = std::variant<
 class PomodoroStateTracker
 {
 public:
+    explicit PomodoroStateTracker(std::vector<PomodoroState> states);
+
     std::vector<PomodoroEvent> update_state(wxTimeSpan time_passed);
+
     void reset();
 private:
-    PomodoroState next_state() const;
+    PomodoroState next_state();
 
-    PomodoroState m_current_state{PomodoroState::WORKING};
-    size_t m_work_block = 0;
-    wxTimeSpan m_remaining_time{0, 0, 30};
+    std::vector<PomodoroState> m_states{};
+    PomodoroState m_current_state{};
+    std::queue<PomodoroState> m_upcoming_states;
 };

@@ -3,12 +3,25 @@
 
 namespace
 {
+
 const wxSize WINDOW_SIZE = {300, 200};
 const wxTimeSpan CLOCK_INTERVAL{0, 0, 1};
+
+std::vector<PomodoroState> get_dummy_states()
+{
+    std::vector<PomodoroState> states;
+
+    states.push_back(PomodoroState{PomodoroState::Type::WORKING, wxTimeSpan{0, 0, 30}});
+    states.push_back(PomodoroState{PomodoroState::Type::BREAK, wxTimeSpan{0, 0, 5}});
+
+    return states;
+}
+
 }
 
 PomodoroFrame::PomodoroFrame()
-        : wxFrame(nullptr, wxID_ANY, "Pomodoro Timer")
+        : wxFrame(nullptr, wxID_ANY, "Pomodoro Timer"),
+          m_pomodoro_state(get_dummy_states())
 {
 
     auto *menuFile = new wxMenu;
@@ -50,26 +63,26 @@ PomodoroFrame::PomodoroFrame()
     m_start_stop_button->Bind(wxEVT_BUTTON, &PomodoroFrame::OnStartStopButton, this);
 }
 
-void PomodoroFrame::OnExit(wxCommandEvent &event)
+void PomodoroFrame::OnExit(wxCommandEvent &)
 {
     Close(true);
 }
 
-void PomodoroFrame::OnAbout(wxCommandEvent &event)
+void PomodoroFrame::OnAbout(wxCommandEvent &)
 {
     wxMessageBox("This is a wxWidgets Hello World example",
                  "About Hello World", wxOK | wxICON_INFORMATION);
 }
 
-void PomodoroFrame::OnHello(wxCommandEvent &event)
+void PomodoroFrame::OnHello(wxCommandEvent &)
 {
     wxLogMessage("Hello world from wxWidgets!");
 }
 
-void PomodoroFrame::OnUpdateClock(wxTimerEvent &event)
+void PomodoroFrame::OnUpdateClock(wxTimerEvent &)
 {
     const auto events = m_pomodoro_state.update_state(CLOCK_INTERVAL);
-    for (const PomodoroEvent &pomodoro_event : events)
+    for (const PomodoroEvent &pomodoro_event: events)
     {
         if (std::holds_alternative<PomodoroUpdateRemainingTime>(pomodoro_event))
         {
@@ -78,46 +91,44 @@ void PomodoroFrame::OnUpdateClock(wxTimerEvent &event)
             {
                 m_clock_text->SetLabel(update_time.remaining_time.Format());
             }
-        }
-        else if (std::holds_alternative<PomodoroStateChange>(pomodoro_event))
+        } else if (std::holds_alternative<PomodoroStateChange>(pomodoro_event))
         {
             const auto &state_change = std::get<PomodoroStateChange>(pomodoro_event);
-            switch (state_change.new_state)
+            switch (state_change.new_state.type)
             {
-                case PomodoroState::WORKING:
+                case PomodoroState::Type::WORKING:
                 {
-                    auto notification = new wxNotificationMessage{"Pomodoro Timer", "Break is over, back to work!", this};
+                    auto notification = new wxNotificationMessage{"Pomodoro Timer", "Break is over, back to work!",
+                                                                  this};
                     notification->Show();
                     SetStatusText("Work Time!");
                     break;
                 }
-                case PomodoroState::BREAK:
+                case PomodoroState::Type::BREAK:
                 {
-                    auto notification = new wxNotificationMessage{"Pomodoro Timer", "Work time is over, time for a short break!", this};
+                    auto notification = new wxNotificationMessage{"Pomodoro Timer",
+                                                                  "Work time is over, time for a break!", this};
                     notification->Show();
                     SetStatusText("Short Break...");
                     break;
                 }
-                case PomodoroState::LONG_BREAK:
-                {
-                    auto notification = new wxNotificationMessage{"Pomodoro Timer", "Work time is over, time for a long break!", this};
-                    notification->Show();
-                    SetStatusText("Long Break...");
-                    break;
-                }
+            }
+            if (m_clock_text != nullptr)
+            {
+                m_clock_text->SetLabel(state_change.new_state.duration.Format());
             }
         }
     }
 }
 
-void PomodoroFrame::OnStartStopButton(wxCommandEvent &) {
+void PomodoroFrame::OnStartStopButton(wxCommandEvent &)
+{
     if (m_clock_timer.IsRunning())
     {
         m_clock_timer.Stop();
         m_start_stop_button->SetLabel(_("start"));
         SetStatusText(_("Stopped timer."));
-    }
-    else
+    } else
     {
         m_clock_timer.Start();
         m_start_stop_button->SetLabel(_("stop"));
