@@ -12,10 +12,13 @@ if(wxWidgets_FOUND)
     message(STATUS "Using wxWidgets libaries: ${wxWidgets_LIBRARIES}")
     set(WX_LINK_ARG ${wxWidgets_LIBRARIES})
 else()
+    set(CPM_WX_VERSION "3.2.4")
+    message(STATUS "Fetching wxWidgets ${CPM_WX_VERSION} with CPM since no install was found")
     CPMAddPackage(
             NAME wxWidgets
-            VERSION 3.2.2.1
-            GITHUB_REPOSITORY "wxWidgets/wxWidgets"
+            VERSION ${CPM_WX_VERSION}
+            URL https://github.com/wxWidgets/wxWidgets/releases/download/v${CPM_WX_VERSION}/wxWidgets-${CPM_WX_VERSION}.zip
+            URL_HASH SHA256=051aa9d5a1b39fec940efd963b702a6082d5eb57935245edcbab21dfe19be209
             EXCLUDE_FROM_ALL "ON"
             OPTIONS "wxBUILD_SHARED OFF"
     )
@@ -23,6 +26,9 @@ else()
 endif()
 
 add_executable(pomodoro WIN32
+        include/PomodoroConfig.hpp
+        include/PomodoroFrame.hpp
+        include/PomodoroState.hpp
         src/main.cpp
         src/PomodoroConfig.cpp
         src/PomodoroFrame.cpp
