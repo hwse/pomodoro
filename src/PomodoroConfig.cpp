@@ -55,7 +55,7 @@ std::vector<PomodoroState> PomodoroConfig::get_states()
         {
             continue;
         }
-        wxLongLong_t duration = m_config->ReadLongLong(std::to_string(i) + "/duration", 0);
+        const auto duration = m_config->ReadLong(std::to_string(i) + "/duration", 0);
         if (duration == 0)
         {
             continue;
@@ -84,7 +84,7 @@ void PomodoroConfig::set_states(const std::vector<PomodoroState> &states)
 
 
         const wxString duration_key = state_key + "/duration";
-        const wxLongLong_t duration_value = state.duration.GetValue().GetValue();
+        const auto duration_value = static_cast<long>(state.duration.GetValue().GetValue());
         m_config->Write(duration_key, duration_value);
 
         index++;
